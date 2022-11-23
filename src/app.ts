@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import http from 'http'
 import { EndpointControllerInterface } from './interfaces/endpoint-controller.interface'
+import { DirectoryController } from './controllers/directory.controller'
 
 const app = express()
 const server = http.createServer(app)
@@ -34,7 +35,9 @@ app.use(
     }),
 )
 
-const endpointControllers: EndpointControllerInterface[] = []
+const endpointControllers: EndpointControllerInterface[] = [
+    new DirectoryController()
+]
 endpointControllers.forEach(controller => controller.registerEndpoints(app))
 
 const port = process.env.PORT || 3000

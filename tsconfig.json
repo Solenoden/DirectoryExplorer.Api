@@ -9,6 +9,7 @@
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": "./src",
+    "allowJs": true,
     "types": [
       "node"
     ],
@@ -22,6 +23,7 @@
     "**/*"
   ],
   "exclude": [
+    "**/dist/*",
     "**/*.spec.*"
   ]
 }

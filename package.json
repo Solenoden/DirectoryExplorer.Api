@@ -2,7 +2,7 @@
   "name": "directory-explorer-api",
   "version": "1.0.0",
   "description": "The api for an Angular Web application which allows you to browse a directory",
-  "main": "dist/app.js",
+  "main": "dist/src/app.js",
   "scripts": {
     "start": "node .",
     "build": "node_modules/.bin/tsc",
