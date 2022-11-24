@@ -5,6 +5,7 @@ import { WorkerOperation } from '../enums/worker-operation.enum'
 import { Directory } from '../models/directory.model'
 import { DirectoryService } from '../services/directory.service'
 import { File } from '../models/file.model'
+import { DirectoryItem } from '../models/directory-item.model'
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 if (!isMainThread && workerData && workerData.operation) {
@@ -28,40 +29,39 @@ async function readDirectory() {
     directory.name = pathParts[pathParts.length - 1]
 
     if (payload.directoryPath) {
-        const directoryItems = await fileSystem.promises.readdir(payload.directoryPath)
-        directoryItems.forEach(currentItem => {
-            const extension = directoryService.getFileExtension(currentItem)
-            const itemPath = directoryService.formatPath(payload.directoryPath + '/' + currentItem)
-            const isFile = !!extension
+        const directoryItems: DirectoryItem[] = []
+        const directoryItemStatPromises: Promise<fileSystem.Stats>[] = []
 
-            if (isFile) {
-                const file = new File()
-                file.name = currentItem
-                file.fullPath = itemPath
-                file.extension = extension
+        const result = await fileSystem.promises.readdir(payload.directoryPath)
+        result.forEach(currentItem => {
+            const directoryItem = new DirectoryItem()
+            directoryItem.name = currentItem
+            directoryItem.fullPath = directoryService.formatPath(payload.directoryPath + '/' + currentItem)
+            directoryItems.push(directoryItem)
+
+            // TODO: Get file permissions
+            // TODO: Spin up a thread per directory item for stat read
+            directoryItemStatPromises.push(fileSystem.promises.stat(directoryItem.fullPath))
+        })
+
+        const statResults = await Promise.all(directoryItemStatPromises)
+        statResults.forEach((statResult, index) => {
+            const directoryItem = directoryItems[index]
+            directoryItem.creationDateEpoch = Math.floor(statResult.birthtimeMs)
+            directoryItem.modificationDateEpoch = Math.floor(statResult.mtimeMs)
+            directoryItem.sizeInKilobytes = statResult.size / 1000
+
+            if (statResult.isFile()) {
+                const file = new File(directoryItem)
+                file.extension = directoryService.getFileExtension(directoryItem.name)
                 directory.files.push(file)
             } else {
-                const subDirectory = new Directory()
-                subDirectory.name = currentItem
-                subDirectory.fullPath = itemPath
+                const subDirectory = new Directory(directoryItem)
                 directory.directories.push(subDirectory)
             }
         })
-
-        const getFileInfoPromises = directory.files.map(file => getFileInformation(file))
-        directory.files = await Promise.all(getFileInfoPromises)
     }
 
     parentPort.postMessage({ directory })
     process.exit()
-}
-
-async function getFileInformation(file: File): Promise<File> {
-    // TODO: Get file permissions
-    const fileStats = await fileSystem.promises.stat(file.fullPath)
-    file.creationDateEpoch = Math.floor(fileStats.birthtimeMs)
-    file.modificationDateEpoch = Math.floor(fileStats.mtimeMs)
-    file.sizeInKilobytes = fileStats.size / 1000
-
-    return file
 }

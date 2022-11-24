@@ -7,10 +7,10 @@ export class DirectoryService {
     private readonly exposedDirectoriesRoot = process.env.EXPOSED_DIRECTORIES_ROOT || '.'
     private readonly workerService = new WorkerService()
 
-    public async getDirectory(path = '/', directory: Directory = null): Promise<Directory> {
+    public async getDirectory(rootPath: string = null, directory: Directory = null): Promise<Directory> {
         return new Promise<Directory>((resolve, reject) => {
-            const fullPath = this.formatPath(this.exposedDirectoriesRoot + '/' + path)
             if (!directory) {
+                const fullPath = this.formatPath(rootPath ? rootPath : this.exposedDirectoriesRoot + '/')
                 directory = new Directory()
                 directory.name = fullPath
                 directory.fullPath = fullPath
@@ -19,7 +19,7 @@ export class DirectoryService {
             const worker = this.workerService.createWorkerThread(
                 WorkerFile.Directory,
                 WorkerOperation.ReadDirectory,
-                { directoryPath: fullPath }
+                { directoryPath: directory.fullPath }
             )
 
             worker.once('message', (result: { directory: Directory }) => {
@@ -29,7 +29,7 @@ export class DirectoryService {
                 }
 
                 const getDirectoryPromises = result.directory.directories.map(
-                    currentDirectory => this.getDirectory(path + currentDirectory.name, directory)
+                    currentDirectory => this.getDirectory(null, currentDirectory)
                 )
                 Promise.all(getDirectoryPromises).then(directories => {
                     directory.directories.push(...directories)
