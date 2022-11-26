@@ -4,7 +4,7 @@ import { WorkerOperation } from '../enums/worker-operation.enum'
 import { WorkerData } from '../interfaces/worker-data.interface'
 
 export class WorkerService {
-    private readonly workersPath = process.env.ENVIRONMENT === 'production' ? './workers' : './dist/src/workers'
+    private readonly workersPath = process.env.ENVIRONMENT === 'production' ? './src/workers' : './dist/src/workers'
 
     public createWorkerThread(
         workerFile: WorkerFile,
