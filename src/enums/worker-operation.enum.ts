@@ -1,3 +1,4 @@
 export enum WorkerOperation {
-    ReadDirectory = 'ReadDirectory'
+    ReadDirectory = 'ReadDirectory',
+    ReadFileStats = 'ReadFileStats'
 }
