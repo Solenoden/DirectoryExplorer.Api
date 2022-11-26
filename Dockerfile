@@ -15,4 +15,4 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install --production
 COPY --from=builder /app/dist .
-CMD ["node", "app.js"]
+CMD ["node", "src/app.js"]
