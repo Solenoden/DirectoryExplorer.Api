@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json .
 RUN npm install -g typescript
 RUN npm install
-COPY src .
+COPY . .
 RUN npm run build
 
 FROM node:$node_version

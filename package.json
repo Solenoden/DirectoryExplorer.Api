@@ -5,9 +5,9 @@
   "main": "dist/src/app.js",
   "scripts": {
     "start": "node .",
-    "build": "node_modules/.bin/tsc",
+    "build": "tsc",
     "prestart": "npm run build",
-    "lint": "node_modules/.bin/eslint ./"
+    "lint": "eslint ./"
   },
   "repository": {
     "type": "git",
