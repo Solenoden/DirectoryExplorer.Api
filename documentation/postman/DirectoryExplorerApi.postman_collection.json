@@ -1,0 +1,33 @@
+{
+	"info": {
+		"_postman_id": "1d5b752d-2c1f-4043-b57c-16618559be08",
+		"name": "DirectoryExplorerApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19767529"
+	},
+	"item": [
+		{
+			"name": "DirectoryGet",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/directory?path=./src",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"directory"
+					],
+					"query": [
+						{
+							"key": "path",
+							"value": "./src"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
